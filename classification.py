@@ -12,16 +12,17 @@ def train(args):
     validation_dir = args['validation_directory']
 
     # Load data
+    img_size = (args['img_size'], args['img_size'])
     train_dataset = image_dataset_from_directory(train_dir,
                                                  shuffle=True,
                                                  batch_size=args['batch_size'],
-                                                 image_size=args['img_size'],
+                                                 image_size=img_size,
                                                  )
 
     validation_dataset = image_dataset_from_directory(validation_dir,
                                                       shuffle=True,
                                                       batch_size=args['batch_size'],
-                                                      image_size=args['img_size'],
+                                                      image_size=img_size
                                                       )
 
     class_names = train_dataset.class_names
@@ -56,7 +57,7 @@ def train(args):
     rescale = tf.keras.layers.experimental.preprocessing.Rescaling(1./127.5, offset= -1)
 
     # Create the base model from the pre-trained model MobileNet V2
-    IMG_SHAPE = args['img_size'] + (3,)
+    IMG_SHAPE = img_size + (3,)
     base_model = tf.keras.applications.MobileNetV2(input_shape=IMG_SHAPE,
                                                    include_top=False,
                                                    weights='imagenet',
@@ -147,10 +148,12 @@ if __name__ == '__main__':
     ap.add_argument("-t", "--train_directory",
                     type=str,
                     help="path to train directory",
+                    required=True
                     )
     ap.add_argument("-v", "--validation_directory",
                     type=str,
                     help="path to validation directory",
+                    required=True
                     )
     ap.add_argument("-e", "--epochs",
                     type=int,
@@ -163,8 +166,8 @@ if __name__ == '__main__':
                     help="size for each batch",
                     )
     ap.add_argument("-s", "--img_size",
-                    type=tuple,
-                    default=(160, 160),
+                    type=int,
+                    default=160,
                     help="size of input image ex:(16, 16)",
                     )
     args = vars(ap.parse_args())
