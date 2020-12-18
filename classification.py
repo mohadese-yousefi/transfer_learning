@@ -1,3 +1,4 @@
+# https://www.tensorflow.org/tutorials/images/transfer_learning
 import os
 import shutil
 import argparse
@@ -103,6 +104,10 @@ def train(args):
                         epochs=args['epochs'],
                         validation_data=validation_dataset)
 
+    # Save model
+    tf.keras.models.save_model(
+        model, args['model_directory'], overwrite=True)
+
     acc = history.history['accuracy']
     val_acc = history.history['val_accuracy']
 
@@ -128,9 +133,8 @@ def train(args):
     plt.xlabel('epoch')
     plt.show()
 
-    #Retrieve a batch of images from the test set
-    image_batch, label_batch = test_dataset.as_numpy_iterator().next()
-    predictions = model.predict_on_batch(image_batch).flatten()
+    loss, accuracy = model.evaluate(test_dataset)
+    print('Test accuracy :', accuracy)
 
 
 if __name__ == '__main__':
@@ -142,7 +146,7 @@ if __name__ == '__main__':
                     )
     ap.add_argument("-m", "--model_directory",
                     type=str,
-                    default="model",
+                    default="model/1",
                     help="path to trained model",
                     )
     ap.add_argument("-t", "--train_directory",
